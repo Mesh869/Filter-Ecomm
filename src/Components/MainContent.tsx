@@ -10,10 +10,11 @@ const MainContent = () => {
 
   interface Product {
     category: string;
-    id: number;
+    id: string;
     title: string;
     price: number;
     rating: number;
+    thumbnail: string;
   }
 
   const [product, setProduct] = useState<Product[]>([]);
@@ -24,7 +25,7 @@ const MainContent = () => {
 
   useEffect(() => {
     // Fetch products based on filters
-    let url = `https://dummyjson.com/products?limit=${itemsPerPage}&skip=${
+    let url = `https://dummyjson.com/products?Limit=${itemsPerPage}&skip=${
       (currentPage - 1) * itemsPerPage
     }`;
 
@@ -83,8 +84,9 @@ const MainContent = () => {
         filteredProducts.sort((a, b) => b.rating - a.rating);
         break;
       default:
-        return filteredProducts;
+      // return filteredProducts;
     }
+    return filteredProducts;
   };
 
   const filteredProducts = getFilteredProducts();
@@ -159,7 +161,7 @@ const MainContent = () => {
         </div>
 
         <div className="grid grid-cols-4 sm:grid-cols-3 md:grid-cols-4 gap-5">
-          {filteredProducts.map((product: any) => (
+          {filteredProducts.map((product: Product) => (
             <Bookcard
               key={product.id}
               id={product.id}
