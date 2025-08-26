@@ -2,6 +2,9 @@
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import Sidebar from "./Components/Sidebar";
 import MainContent from "./Components/MainContent";
+import ProductPage from "./Components/ProductPage";
+import PopularBlog from "./Components/PopularBlog";
+import Topsellers from "./Components/Topsellers";
 import "./App.css";
 
 function App() {
@@ -14,7 +17,13 @@ function App() {
           <div className="rounded w-full flex justify-between flex-wrap">
             <Routes>
               <Route path="/" element={<MainContent />} />
+              <Route path="/product/:id" element={<ProductPage />} />
             </Routes>
+
+            <div>
+              <PopularBlog />
+              <Topsellers />
+            </div>
           </div>
         </div>
       </Router>
