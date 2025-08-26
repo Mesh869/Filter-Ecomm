@@ -24,10 +24,7 @@ const MainContent = () => {
   const itemsPerPage = 12;
 
   useEffect(() => {
-    // Fetch products based on filters
-    let url = `https://dummyjson.com/products?Limit=${itemsPerPage}&skip=${
-      (currentPage - 1) * itemsPerPage
-    }`;
+    let url = `https://dummyjson.com/products?limit=100`; // fetch more at once
 
     if (keywords) {
       url = `https://dummyjson.com/products/search?q=${keywords}`;
@@ -37,12 +34,11 @@ const MainContent = () => {
       .get(url)
       .then((response) => {
         setProduct(response.data.products);
-        // console.log(response.data.products);
       })
       .catch((error) => {
         console.error("Error fetching products:", error);
       });
-  }, [keywords, currentPage]);
+  }, [keywords]);
 
   const getFilteredProducts = () => {
     let filteredProducts = product;
@@ -51,8 +47,6 @@ const MainContent = () => {
       filteredProducts = filteredProducts.filter(
         (product) => product.category === selectedCategory
       );
-
-      console.log(filteredProducts);
     }
 
     if (minPrize !== undefined) {
@@ -84,19 +78,24 @@ const MainContent = () => {
         filteredProducts.sort((a, b) => b.rating - a.rating);
         break;
       default:
-      // return filteredProducts;
+        break;
     }
+
     return filteredProducts;
   };
 
   const filteredProducts = getFilteredProducts();
-  console.log(filteredProducts);
 
-  const totalProducts = 100;
-  const totalPages = Math.ceil(totalProducts / itemsPerPage);
+  //  Apply pagination after filtering
+  const paginatedProducts = filteredProducts.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
 
   const handlePageChange = (page: number) => {
-    if (page > 0 && page < totalPages) {
+    if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
     }
   };
@@ -126,10 +125,11 @@ const MainContent = () => {
       <div className="mb-5">
         <div className="flex flex-col sm:flex-row justify-between items-center">
           <div className="relative mb-5 mt-5">
-            <button className="border px-4 py-2 rounded-full flex  items-center">
+            <button
+              onClick={() => setDropDownMenu(!dropDownMenu)}
+              className="border px-4 py-2 rounded-full flex items-center"
+            >
               <Tally3 className="mr-2" />
-              {/* <span>Filter</span> */}
-
               {filter !== "all"
                 ? filter.charAt(0).toLowerCase() + filter.slice(1)
                 : "Filter"}
@@ -161,7 +161,7 @@ const MainContent = () => {
         </div>
 
         <div className="grid grid-cols-4 sm:grid-cols-3 md:grid-cols-4 gap-5">
-          {filteredProducts.map((product: Product) => (
+          {paginatedProducts.map((product: Product) => (
             <Bookcard
               key={product.id}
               id={product.id}
@@ -178,11 +178,11 @@ const MainContent = () => {
           <button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
-            className=" px-4 py-2"
+            className="px-4 py-2"
           >
             Previous
           </button>
-          {/* <span>Page {currentPage}</span> */}
+
           <div className="flex flex-wrap justify-content">
             {getPaginationButtons().map((page) => (
               <button
@@ -196,10 +196,11 @@ const MainContent = () => {
               </button>
             ))}
           </div>
+
           <button
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className=" px-4 py-2 "
+            className="px-4 py-2"
           >
             Next
           </button>
